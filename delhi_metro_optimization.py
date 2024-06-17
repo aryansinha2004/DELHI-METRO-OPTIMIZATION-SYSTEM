@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Tk, Label, Button, Text, END, StringVar, OptionMenu, Frame, Toplevel
 from PIL import Image, ImageTk
-
+from tkinter import PhotoImage
+from tkinter import Tk, Canvas
 # Metro Lines and Routes Data
 metro_lines = {
     "Red Line": ["Shaheed Sthal", "Rithala"],
@@ -103,18 +104,44 @@ def display_results(func, *args):
 def show_route_map():
     top = Toplevel(root)
     top.title("Delhi Metro Route Map")
-    img = Image.open("delhi_metro_route_map.png")  # Placeholder for the route map image
-    img = img.resize((600, 400), Image.LANCZOS)
+    img = Image.open("delhi_metro_route.png")  # Placeholder for the route map image
+    img = img.resize((1200, 800), Image.LANCZOS)
     img = ImageTk.PhotoImage(img)
     panel = Label(top, image=img)
     panel.image = img  # Keep a reference to avoid garbage collection
     panel.pack()
+def create_gradient_background(canvas, color1, color2):
+    width = canvas.winfo_screenwidth()
+    height = canvas.winfo_screenheight()
 
-# Tkinter UI Setup
+    # Create a linear gradient from color1 to color2
+    for y in range(height):
+        # Calculate the color at this point along the gradient
+        r = int(color1[0] + (color2[0] - color1[0]) * y / height)
+        g = int(color1[1] + (color2[1] - color1[1]) * y / height)
+        b = int(color1[2] + (color2[2] - color1[2]) * y / height)
+
+        # Convert the RGB values to a hexadecimal color code
+        color = f'#{r:02x}{g:02x}{b:02x}'
+
+        # Draw a line at this y-coordinate with the calculated color
+        canvas.create_line(0, y, width, y, fill=color, width=1)
+
+# Create the Tkinter window
 root = Tk()
-root.title("Delhi Metro Operations Optimization")
-root.geometry("900x700")
-root.configure(bg="#f0f0f0")
+root.title("Delhi Metro")
+root.attributes('-fullscreen', True)  # Make the window fullscreen
+
+# Create a Canvas widget to draw the gradient background
+canvas = Canvas(root, highlightthickness=0)
+canvas.pack(fill="both", expand=True)
+
+# Specify the start and end colors of the gradient (blue to purple)
+color1 = (0, 0, 255)       # Blue (start color)
+color2 = (128, 0, 128)     # Purple (end color)
+
+# Draw the gradient background on the Canvas
+create_gradient_background(canvas, color1, color2)
 
 # Variables for OptionMenu
 selected_line = StringVar(root)
@@ -124,7 +151,9 @@ selected_direction.set("Forward")
 
 # Main frame
 main_frame = Frame(root, bg="#f0f0f0")
-main_frame.pack(pady=20)
+main_frame.pack(pady=10)
+main_frame.place(relx=0.5, rely=0.5, anchor='center')
+
 
 # UI Components
 Label(main_frame, text="Delhi Metro Operations Optimization", font=("Helvetica", 18, "bold"), bg="#f0f0f0").grid(row=0, columnspan=2, pady=10)
